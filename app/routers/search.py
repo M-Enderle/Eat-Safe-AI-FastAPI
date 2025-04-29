@@ -22,7 +22,7 @@ async def search_items(
     safe, food_query = is_safe(query)
 
     if not safe:
-        raise HTTPException(status_code=400, detail="Unsafe content detected.")
+        raise HTTPException(status_code=400, detail="Please enter a valid food query.")
     
     # Generate image using the food query
     image_base64 = get_image(food_query)
