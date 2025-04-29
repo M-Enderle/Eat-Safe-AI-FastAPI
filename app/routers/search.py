@@ -41,7 +41,7 @@ async def search_items(
         "name": food_query,
         "overall_rating": 4.5,
         "text": "TEST",
-        "ingredients_rating": [],
+        "ingredients_rating": [{"apple": 10.0}],
         "timestamp": datetime.now()
     }
 
