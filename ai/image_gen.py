@@ -19,7 +19,7 @@ def _download_from_vercel(filename: str, dest: str) -> bool:
     match = next((obj for obj in blobs if obj['pathname'] == filename), None)
     if match:
         dest = str(os.environ.get("LOCAL_CACHE_DIR", "local_cachedir") + "/images/")
-        os.makedirs(os.path.dirname(dest), exist_ok=True)
+        os.makedirs(dest, exist_ok=True)
         vercel_blob.download_file(match['url'], dest)
         logging.info(f"Downloaded {filename} from Vercel Blob.")
         return True
