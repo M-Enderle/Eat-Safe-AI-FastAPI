@@ -11,6 +11,9 @@ class SearchResult(BaseModel):
     imageBase64: str
     name: str
     overall_rating: float
+    text: str
+    ingredients_rating: list
+    timestamp: str
     
 
 @router.get("/search", response_model=SearchResult)
