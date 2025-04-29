@@ -3,12 +3,15 @@ name = "fast-api-server"
 version = "0.1.0"
 description = "FastAPI server for Vercel deployment"
 authors = ["Your Name <your.email@example.com>"]
+packages = [{ include = "app" }, { include = "ai" }]
 
 [tool.poetry.dependencies]
 python = "^3.9"
 fastapi = "^0.109.0"
 uvicorn = "^0.25.0"
 pydantic = "^2.5.0"
+google-genai = "^1.12.1"
+dotenv = "^0.9.9"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.4.0"
