@@ -415,6 +415,17 @@ files = [
 colors = ["colorama (>=0.4.6)"]
 
 [[package]]
+name = "joblib"
+version = "1.4.2"
+description = "Lightweight pipelining with Python functions"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "joblib-1.4.2-py3-none-any.whl", hash = "sha256:06d478d5674cbc267e7496a410ee875abd68e4340feff4490bcb7afb88060ae6"},
+    {file = "joblib-1.4.2.tar.gz", hash = "sha256:2382c5816b2636fbd20a09e0f4e9dad4736765fdfb7dca582943b9c1366b3f0e"},
+]
+
+[[package]]
 name = "mypy"
 version = "1.15.0"
 description = "Optional static typing for Python"
@@ -882,7 +893,6 @@ files = [
 
 [package.dependencies]
 anyio = ">=3.4.0,<5"
-typing-extensions = {version = ">=3.10.0", markers = "python_version < \"3.10\""}
 
 [package.extras]
 full = ["httpx (>=0.22.0)", "itsdangerous", "jinja2", "python-multipart (>=0.0.7)", "pyyaml"]
@@ -927,6 +937,27 @@ files = [
     {file = "tomli-2.2.1-py3-none-any.whl", hash = "sha256:cb55c73c5f4408779d0cf3eef9f762b9c9f147a77de7b258bef0a5628adc85cc"},
     {file = "tomli-2.2.1.tar.gz", hash = "sha256:cd45e1dc79c835ce60f7404ec8119f2eb06d38b1deba146f07ced3bbc44505ff"},
 ]
+
+[[package]]
+name = "tqdm"
+version = "4.67.1"
+description = "Fast, Extensible Progress Meter"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "tqdm-4.67.1-py3-none-any.whl", hash = "sha256:26445eca388f82e72884e0d580d5464cd801a3ea01e63e5601bdff9ba6a48de2"},
+    {file = "tqdm-4.67.1.tar.gz", hash = "sha256:f8aef9c52c08c13a65f30ea34f4e5aac3fd1a34959879d7e59e63027286627f2"},
+]
+
+[package.dependencies]
+colorama = {version = "*", markers = "platform_system == \"Windows\""}
+
+[package.extras]
+dev = ["nbval", "pytest (>=6)", "pytest-asyncio (>=0.24)", "pytest-cov", "pytest-timeout"]
+discord = ["requests"]
+notebook = ["ipywidgets (>=6)"]
+slack = ["slack-sdk"]
+telegram = ["requests"]
 
 [[package]]
 name = "typing-extensions"
@@ -988,6 +1019,23 @@ typing-extensions = {version = ">=4.0", markers = "python_version < \"3.11\""}
 
 [package.extras]
 standard = ["colorama (>=0.4)", "httptools (>=0.5.0)", "python-dotenv (>=0.13)", "pyyaml (>=5.1)", "uvloop (>=0.14.0,!=0.15.0,!=0.15.1)", "watchfiles (>=0.13)", "websockets (>=10.4)"]
+
+[[package]]
+name = "vercel-blob"
+version = "0.3.2"
+description = "A Python Wrapper for Vercel Blob Storage API"
+optional = false
+python-versions = "<4.0,>=3.10"
+files = [
+    {file = "vercel_blob-0.3.2-py3-none-any.whl", hash = "sha256:f17581ae3fe573b2c32a4d6866f6d9e18e5624fd22f3a0b6c3ed557ed46e41e9"},
+    {file = "vercel_blob-0.3.2.tar.gz", hash = "sha256:24d8bc337dd55173a6aa6dbfa921f70f30d71a13f1855ce7492b932dfe782f3c"},
+]
+
+[package.dependencies]
+certifi = ">=2024.07.04"
+requests = ">=2.32.3,<3.0.0"
+tqdm = ">=4.67.1,<5.0.0"
+urllib3 = ">=2.2.2"
 
 [[package]]
 name = "websockets"
@@ -1069,5 +1117,5 @@ files = [
 
 [metadata]
 lock-version = "2.0"
-python-versions = "^3.9"
-content-hash = "5fb64bd78aaf6bf24339527a853fb3c11aaa5019e14abb59f1c648c403bab722"
+python-versions = "^3.10 <4.0"
+content-hash = "0ceae603b016ac9ef984fae5a7bd6368e80f05643dd4c1069df8bb124ff5ed8f"

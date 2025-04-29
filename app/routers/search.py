@@ -1,10 +1,9 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from ai.image_gen import generate_image
+from ai.image_gen import get_image
 from ai.safety import is_safe
 
 router = APIRouter()
-
 
 class SearchResult(BaseModel):
     status: str
@@ -26,7 +25,7 @@ async def search_items(
         raise HTTPException(status_code=400, detail="Unsafe content detected.")
     
     # Generate image using the food query
-    image_base64 = generate_image(food_query)
+    image_base64 = get_image(food_query)
 
     if not image_base64:
         raise HTTPException(status_code=500, detail="Image generation failed.")

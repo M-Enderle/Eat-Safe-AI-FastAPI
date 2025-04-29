@@ -6,13 +6,15 @@ authors = ["Your Name <your.email@example.com>"]
 packages = [{ include = "app" }, { include = "ai" }]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.10 <4.0"
 fastapi = "^0.109.0"
 uvicorn = "^0.25.0"
 pydantic = "^2.5.0"
 google-genai = "^1.12.1"
 dotenv = "^0.9.9"
 pillow = "^11.2.1"
+joblib = "^1.4.2"
+vercel-blob = "^0.3.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.4.0"
