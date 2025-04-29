@@ -39,7 +39,7 @@ async def search_items(
         "overall_rating": 4.5,
         "text": "NULL",
         "ingredients_rating": [],
-        "timestamp": datetime.now(),
+        "timestamp": datetime.now().isoformat(),
     }
 
     return SearchResult(**mock_data)
