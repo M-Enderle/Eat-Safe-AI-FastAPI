@@ -40,7 +40,7 @@ async def search_items(
         "imageBase64": image_base64,
         "name": food_query,
         "overall_rating": 4.5,
-        "text": "NULL",
+        "text": "TEST",
         "ingredients_rating": [],
         "timestamp": datetime.now()
     }
