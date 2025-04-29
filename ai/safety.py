@@ -25,8 +25,9 @@ def is_safe(search_term: str) -> Tuple[bool, str]:
 
     content = (
         f'You have 2 tasks. First task is to check if the content is a food query. If not it is not safe. '
-        f'Content: {search_term}. Second task is to return the food query in singular english form. Try to make it more precise. '
+        f'Content: {search_term}. Second task is to return the food query in singular english form. '
         f'So for example "pizzas" return "pizza" and "Pommes" return "Potatoe Fries". '
+        f'Return only the english name in no other language. Keep the name short. '
         f'Return a json with the following keys: "is_safe" and "food_query". '
     )
 
