@@ -31,6 +31,7 @@ def generate_image(food_query: str) -> str:
         'Use a plain white background — no shadows touching the border, gray tints, borders, or edges touching the frame. '
         'The image should have a wide 4:3 aspect ratio and be visually appealing.'
         'No text, logos, or watermarks should be present in the image.'
+        'Make it look like a food stylist shot this photo in a photo box with a white background with a sony a7r5 camera.'
     )
 
     response = client.models.generate_content(
