@@ -19,7 +19,6 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
-cachedir
 
 # Virtual environments
 .env
