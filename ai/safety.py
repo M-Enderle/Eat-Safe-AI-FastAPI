@@ -32,7 +32,7 @@ def is_safe(search_term: str) -> Tuple[bool, str]:
     )
 
     response = gemini().models.generate_content(
-        model="gemini-2.0-flash-lite",
+        model="gemini-2.0-flash",
         contents=content,
         config=types.GenerateContentConfig(
             response_modalities=['TEXT'],
