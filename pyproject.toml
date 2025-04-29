@@ -12,6 +12,7 @@ uvicorn = "^0.25.0"
 pydantic = "^2.5.0"
 google-genai = "^1.12.1"
 dotenv = "^0.9.9"
+pillow = "^11.2.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.4.0"

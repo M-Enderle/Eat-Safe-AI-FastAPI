@@ -1,43 +1,53 @@
 import os
+from google.genai import types
+from google import genai
 from dotenv import load_dotenv
-import requests
+from PIL import Image
+from io import BytesIO
+import base64
 
 load_dotenv()
 
-IMAGE_ROUTER_KEY = os.getenv("IMAGE_ROUTER_KEY")
-if not IMAGE_ROUTER_KEY:
-    raise ValueError("IMAGE_ROUTER_KEY environment variable not set")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+if not GEMINI_API_KEY:
+    raise ValueError("GEMINI_API_KEY environment variable not set")
+
+client = genai.Client(api_key=GEMINI_API_KEY)
 
 
-def generate_image(food_query: str) -> bytes:
-    """Generate an image based on a food query using Gemini API and return the image data as bytes.
+def generate_image(food_query: str) -> str:
+    """Generate an image based on a food query using Gemini API and return the image data as a base64 string.
 
     Args:
         food_query (str): The food query to generate an image for.
 
     Returns:
-        bytes: The image data in bytes.
+        str: The image data as a base64-encoded string.
     """
 
-    url = "https://ir-api.myqa.cc/v1/openai/images/generations"
-    payload = {
-    "prompt": f"Generate an image of {food_query}. White background no shadow etc. Plain white. Visually very appealing",
-    "model": "black-forest-labs/FLUX-1-schnell:free"
-    }
-    headers = {
-    "Authorization": f"Bearer {IMAGE_ROUTER_KEY}",
-    "Content-Type": "application/json"
-    }
+    contents = (
+        f'Generate a high-resolution, photorealistic image of {food_query} for a food blog. '
+        'The food should be centered and viewed from the side, with no other objects in the image. '
+        'Use a plain white background — no shadows touching the border, gray tints, borders, or edges touching the frame. '
+        'The image should have a wide 4:3 aspect ratio and be visually appealing.'
+        'No text, logos, or watermarks should be present in the image.'
+    )
 
-    response = requests.post(url, json=payload, headers=headers)
-    base64 = response.json().get("data", {})[0].get("b64_json", None)
+    response = client.models.generate_content(
+        model="gemini-2.0-flash-exp-image-generation",
+        contents=contents,
+        config=types.GenerateContentConfig(
+            response_modalities=['TEXT', 'IMAGE'],
+        )
+    )
 
-    return base64
+    for part in response.candidates[0].content.parts:
+        if part.inline_data is not None and part.text is None:
+            image = Image.open(BytesIO((part.inline_data.data)))
+            image = image.convert("RGB")
+            image_bytes = BytesIO()
+            image.save(image_bytes, format="JPEG")
+            image_bytes.seek(0)
+            image_base64 = base64.b64encode(image_bytes.getvalue()).decode('utf-8')
+            return image_base64
 
-
-if __name__ == "__main__":
-    # Example usage
-    food_query = "A delicious pizza with pepperoni and mushrooms"
-    generated_image = generate_image(food_query)
-    print(generated_image)
-    
