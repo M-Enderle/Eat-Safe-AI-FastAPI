@@ -6,9 +6,10 @@ from ai.utils import gemini
 from google.genai import types
 from typing import Tuple
 from joblib import Memory
+import os
 
 logging.basicConfig(level=logging.INFO)
-memory = Memory("tmp/cache")
+memory = Memory(os.environ.get("LOCAL_CACHE_DIR", "local_cachedir"))
 
 @memory.cache
 def is_safe(search_term: str) -> Tuple[bool, str]:
