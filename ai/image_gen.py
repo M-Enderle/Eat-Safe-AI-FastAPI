@@ -18,7 +18,7 @@ def _download_from_vercel(filename: str, dest: str) -> bool:
     blobs = vercel_blob.list().get("blobs", [])
     match = next((obj for obj in blobs if obj['pathname'] == filename), None)
     if match:
-        vercel_blob.download_file(match['url'], "local_cachedir/images/")
+        vercel_blob.download_file(match['url'], "tmp/cache/images/")
         return True
     return False
 
@@ -30,7 +30,7 @@ def search_for_existing_image(food_query: str) -> str:
     Returns:
         str: Base64 image string if found, else None.
     """
-    path = os.path.join("local_cachedir", "images", food_query.replace(" ", "_") + ".jpg")
+    path = os.path.join("tmp/cache", "images", food_query.replace(" ", "_") + ".jpg")
     if os.path.exists(path):
         return _read_image_base64(path)
     filename = os.path.basename(path)

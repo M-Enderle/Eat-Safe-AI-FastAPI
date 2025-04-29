@@ -8,14 +8,14 @@ from typing import Tuple
 from joblib import Memory
 
 logging.basicConfig(level=logging.INFO)
-memory = Memory("local_cachedir")
+memory = Memory("tmp/cache")
 
 @memory.cache
 def is_safe(search_term: str) -> Tuple[bool, str]:
     """Check if the content is safe using Gemini API.
 
     Args:
-        content (str): The content to check for safety.
+        search_term (str): The content to check for safety.
 
     Returns:
         bool: True if the content is safe, False otherwise.
