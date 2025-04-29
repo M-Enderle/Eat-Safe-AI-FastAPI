@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO)
 def search_for_existing_image(food_query: str) -> str:
     """Return the image as base64 string if exists."""
     blobs = vercel_blob.list().get("blobs", [])
-    url = next((obj for obj in blobs if obj['pathname'] == food_query.replace(" ", "_") + ".jpg"), None)
+    url = next((obj for obj in blobs if obj['pathname'] == food_query.replace(" ", "_").lower() + ".jpg"), None)
     if url:  # Check if url is not None
         response = requests.get(url["url"])
         if response.status_code == 200:
@@ -27,7 +27,7 @@ def search_for_existing_image(food_query: str) -> str:
 
 def _save_and_upload_image(food_query: str, image_bytes: bytes):
     """Save image locally and upload to Vercel Blob."""
-    vercel_blob.put(food_query.replace(" ", "_") + ".jpg", image_bytes, {"addRandomSuffix": False})
+    vercel_blob.put(food_query.replace(" ", "_").lower() + ".jpg", image_bytes, {"addRandomSuffix": False})
 
 def generate_image(food_query: str) -> str:
     """
