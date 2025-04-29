@@ -5,42 +5,24 @@ from io import BytesIO
 from PIL import Image
 from ai.utils import gemini
 import vercel_blob
+import requests
 
 logging.basicConfig(level=logging.INFO)
 
-def _read_image_base64(path: str) -> str:
-    """Read image file and return base64 string."""
-    with open(path, "rb") as f:
-        return base64.b64encode(f.read()).decode('utf-8')
-
-def _download_from_vercel(filename: str, dest: str) -> bool:
-    """Download file from Vercel Blob if it exists."""
-    blobs = vercel_blob.list().get("blobs", [])
-    match = next((obj for obj in blobs if obj['pathname'] == filename), None)
-    if match:
-        dest = str(os.environ.get("LOCAL_CACHE_DIR", "/tmp") + "/images/")
-        print(dest)
-        os.makedirs(dest, exist_ok=True)
-        vercel_blob.download_file(match['url'], dest)
-        logging.info(f"Downloaded {filename} from Vercel Blob.")
-        return True
-    return False
-
 def search_for_existing_image(food_query: str) -> str:
-    """
-    Search for an image locally or on Vercel Blob.
-    Args:
-        food_query (str): The food query.
-    Returns:
-        str: Base64 image string if found, else None.
-    """
-    path = os.path.join(os.environ.get("LOCAL_CACHE_DIR", "/tmp"), "images", food_query.replace(" ", "_") + ".jpg")
-    filename = os.path.basename(path)
-    if _download_from_vercel(filename, os.path.dirname(path)):
-        b64 = _read_image_base64(path)
-        os.remove(path)
-        logging.info(f"Image found for {food_query} in Vercel Blob.")
-        return b64
+    """Return the image as base64 string if exists."""
+    blobs = vercel_blob.list().get("blobs", [])
+    url = next((obj for obj in blobs if obj['pathname'] == food_query.replace(" ", "_") + ".jpg"), None)
+    if url:  # Check if url is not None
+        response = requests.get(url["url"])
+        if response.status_code == 200:
+            img = Image.open(BytesIO(response.content))
+            buf = BytesIO()
+            img.save(buf, format="JPEG")
+            image_bytes = buf.getvalue()
+            return base64.b64encode(image_bytes).decode('utf-8')
+        
+    logging.info(f"No cached image found for {food_query}")
     return None
 
 def _save_and_upload_image(food_query: str, image_bytes: bytes):
@@ -101,3 +83,9 @@ def get_image(food_query: str) -> str:
         return image_base64
     logging.info(f"Generating new image for {food_query}")
     return generate_image(food_query)
+
+
+if __name__ == "__main__":
+    blobs = vercel_blob.list().get("blobs", [])
+    match = next((obj for obj in blobs if obj['pathname'] == "banana.jpg"), None)
+    print(match)
