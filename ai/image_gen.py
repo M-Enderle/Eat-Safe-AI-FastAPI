@@ -8,17 +8,6 @@ import vercel_blob
 
 logging.basicConfig(level=logging.INFO)
 
-def get_image_path(food_query: str) -> str:
-    """
-    Get the local file path for a food image.
-    Args:
-        food_query (str): The food query.
-    Returns:
-        str: Path to the image file.
-    """
-    filename = food_query.lower().replace(' ', '_') + ".png"
-    return os.path.join("local_cachedir", "images", filename)
-
 def _read_image_base64(path: str) -> str:
     """Read image file and return base64 string."""
     with open(path, "rb") as f:
@@ -29,7 +18,7 @@ def _download_from_vercel(filename: str, dest: str) -> bool:
     blobs = vercel_blob.list().get("blobs", [])
     match = next((obj for obj in blobs if obj['pathname'] == filename), None)
     if match:
-        vercel_blob.download_file(match['url'], dest)
+        vercel_blob.download_file(match['url'], "local_cachedir/images/")
         return True
     return False
 
@@ -41,7 +30,7 @@ def search_for_existing_image(food_query: str) -> str:
     Returns:
         str: Base64 image string if found, else None.
     """
-    path = get_image_path(food_query)
+    path = os.path.join("local_cachedir", "images", food_query.replace(" ", "_") + ".jpg")
     if os.path.exists(path):
         return _read_image_base64(path)
     filename = os.path.basename(path)
@@ -51,11 +40,7 @@ def search_for_existing_image(food_query: str) -> str:
 
 def _save_and_upload_image(food_query: str, image_bytes: bytes):
     """Save image locally and upload to Vercel Blob."""
-    path = get_image_path(food_query)
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, "wb") as f:
-        f.write(image_bytes)
-    vercel_blob.put(os.path.basename(path), image_bytes, {"addRandomSuffix": False})
+    vercel_blob.put(food_query.replace(" ", "_") + ".jpg", image_bytes, {"addRandomSuffix": False})
 
 def generate_image(food_query: str) -> str:
     """
