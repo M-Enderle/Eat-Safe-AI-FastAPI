@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from ai.image_gen import get_image
 from ai.safety import is_safe
+from datetime import datetime
 
 router = APIRouter()
 
@@ -35,7 +36,10 @@ async def search_items(
         "status": "success",
         "imageBase64": image_base64,
         "name": food_query,
-        "overall_rating": 4.5
+        "overall_rating": 4.5,
+        "text": "NULL",
+        "ingredients_rating": [],
+        "timestamp": datetime.now(),
     }
 
     return SearchResult(**mock_data)
