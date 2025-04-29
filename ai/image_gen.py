@@ -17,7 +17,7 @@ def get_image_path(food_query: str) -> str:
         str: Path to the image file.
     """
     filename = food_query.lower().replace(' ', '_') + ".png"
-    return os.path.join("cachedir", "images", filename)
+    return os.path.join("local_cachedir", "images", filename)
 
 def _read_image_base64(path: str) -> str:
     """Read image file and return base64 string."""
