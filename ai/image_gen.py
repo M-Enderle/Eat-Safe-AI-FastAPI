@@ -33,6 +33,7 @@ def generate_image(food_query: str) -> str:
         'No text, logos, or watermarks should be present in the image.'
         'Make it look like a food stylist shot this photo in a photo box with a white background with a sony a7r5 camera.'
         'The food should be fully visible and not cropped in any way or touching the edges of the image.'
+        'Enforce 4:3 wide aspect ratio and a white background.'
     )
 
     response = client.models.generate_content(
