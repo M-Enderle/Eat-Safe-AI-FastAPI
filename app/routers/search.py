@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from fastapi import Request
 
 router = APIRouter()
 
@@ -23,10 +22,10 @@ def mock_search(query: str) -> SearchResult:
 
 
 @router.get("/search", response_model=SearchResult)
-async def search_items(request: Request) -> SearchResult:
+async def search_items(
+    query: str,
+) -> SearchResult:
     """
     Search for items based on the query string.
     """
-    # get query from variables
-    query = request.query_params.get("query")
     return mock_search(query)
