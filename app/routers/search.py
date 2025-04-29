@@ -13,7 +13,7 @@ class SearchResult(BaseModel):
     overall_rating: float
     text: str
     ingredients_rating: list
-    timestamp: str
+    timestamp: datetime
     
 
 @router.get("/search", response_model=SearchResult)
@@ -42,7 +42,7 @@ async def search_items(
         "overall_rating": 4.5,
         "text": "NULL",
         "ingredients_rating": [],
-        "timestamp": datetime.now().strftime('%-m/%-d/%Y %-I:%M%p')
+        "timestamp": datetime.now()
     }
 
     return SearchResult(**mock_data)
