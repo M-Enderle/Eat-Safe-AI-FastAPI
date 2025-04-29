@@ -8,7 +8,7 @@ from typing import Tuple
 from joblib import Memory
 
 logging.basicConfig(level=logging.INFO)
-memory = Memory("cachedir")
+memory = Memory("local_cachedir")
 
 @memory.cache
 def is_safe(search_term: str) -> Tuple[bool, str]:
