@@ -1,6 +1,6 @@
 import time
 import logging
-from utils import gemini
+from ai.utils import gemini
 from google.genai import types
 from typing import Tuple
 

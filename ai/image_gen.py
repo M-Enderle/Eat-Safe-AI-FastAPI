@@ -2,7 +2,7 @@ from google.genai import types
 from PIL import Image
 from io import BytesIO
 import base64
-from utils import gemini
+from ai.utils import gemini
 
 def generate_image(food_query: str) -> str:
     """Generate an image based on a food query using Gemini API and return the image data as a base64 string.
