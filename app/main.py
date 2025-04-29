@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
-from app.routers import hello
+from app.routers import hello, search
 
 app = FastAPI(
     title="FastAPI Server",
@@ -20,7 +21,4 @@ app.add_middleware(
 
 # Include routers
 app.include_router(hello.router, tags=["hello"])
-
-@app.get("/")
-async def root():
-    return {"message": "Welcome to FastAPI server"}
+app.include_router(search.router, tags=["search"])
