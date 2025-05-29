@@ -3,7 +3,7 @@ import re
 
 from rich import print
 
-from ai.utils import gemini
+from ai.utils import gemini, build_user_profile
 
 
 def get_common_ingredients(dish_name: str) -> list:
@@ -54,7 +54,7 @@ def get_ingredients_rating(ingredient: list, user_profile: dict) -> float:
     Use gemini to assess the ingredient rating based on user profile.
     """
     prompt = (
-        f"Given the user's intolerance profile: {user_profile}, rate the compatibility of each ingredient below. "
+        f"Given the user's intolerance profile: \n\n {build_user_profile(user_profile)} \n\n, rate the compatibility of each ingredient below. "
         "Only consider intolerances the user actually has; ignore those marked as 'Not Intolerant'. "
         f"Ingredients: {ingredient}. "
         "For each ingredient, provide a rating from 0 (fully compatible) to 100 (extremely incompatible), along with a brief explanation. "
@@ -95,24 +95,37 @@ def generate_overall_rating(ingredients: dict, user_profile: dict) -> float:
     if not ingredients:
         return 0.0
 
-    # Calculate overall rating based on weighted average
-    total_weight = sum(
-        ingredient.get("g_100", 0) for ingredient in ingredients.values()
+    # Use LLM to predict the overall rating based on the ingredients and user profile
+    prompt = (
+        f"Given the following dish ingredients and their analysis: {json.dumps(ingredients)}, "
+        f"and the user's intolerance profile: \n\n {build_user_profile(user_profile)} \n\n, "
+        "predict an overall compatibility rating for the dish from 0 (fully compatible) to 100 (extremely incompatible). "
+        "Respond with a single JSON object: {\"overall_rating\": float}. "
+        "Do not include any other text or explanation."
     )
-    if total_weight > 0:
-        overall_rating = (
-            sum(
-                ingredient.get("weighted_rating", 0)
-                for ingredient in ingredients.values()
-            )
-            / total_weight
-        )
-    else:
-        # If no weights available, use simple average
-        ratings = [ingredient.get("rating", 0) for ingredient in ingredients.values()]
-        overall_rating = sum(ratings) / len(ratings) if ratings else 0.0
 
-    return overall_rating
+    response = gemini().models.generate_content(
+        model="gemini-2.0-flash-lite",
+        contents=prompt,
+        config={"response_modalities": ["TEXT"], "temperature": 0.0},
+    )
+
+    for part in response.candidates[0].content.parts:
+        if part.text is not None:
+            try:
+                match = re.search(r"\{.*\}", part.text, re.DOTALL)
+                if match:
+                    json_str = match.group(0)
+                    result = json.loads(json_str)
+                    if isinstance(result, dict) and "overall_rating" in result:
+                        return float(result["overall_rating"])
+            except Exception as e:
+                print(f"Error parsing LLM response for overall rating: {e}")
+                continue
+
+    # Fallback: use simple average if LLM fails
+    ratings = [ingredient.get("rating", 0) for ingredient in ingredients.values()]
+    return sum(ratings) / len(ratings) if ratings else 0.0
 
 
 def generate_text(ingredients: dict, user_profile: dict, dish_name: str) -> str:
@@ -121,7 +134,7 @@ def generate_text(ingredients: dict, user_profile: dict, dish_name: str) -> str:
     """
     prompt = (
         f"Given the dish '{dish_name}' and its ingredients analysis: {json.dumps(ingredients)}, "
-        f"and the user's intolerance profile: {user_profile}, "
+        f"and the user's intolerance profile: \n\n {build_user_profile(user_profile)} \n\n, "
         "provide a detailed analysis of the dish. "
         "Include information about the overall compatibility, key ingredients to watch out for, "
         "and potential modifications or alternatives. "
@@ -184,13 +197,21 @@ def analyze_dish(dish_name: str, user_profile: dict) -> dict:
 if __name__ == "__main__":
     dish_name = "Mango Milkshake"
 
-    user_profile = "The user is intolerant to fructose. He has no other intolerances."
+    user_profile = {
+        "intolerances": {
+            "fructose": True,
+            "gluten": False,
+            "lactose": False,
+            "peanut": False,
+        },
+        "notes": "",
+    }
 
     dish_analysis = analyze_dish(dish_name, user_profile)
 
     print(f"\n🍽️  Dish Analysis: {dish_name}")
     print("=" * 80)
-    print(f"Overall Rating: {dish_analysis['overall_rating']:.1f}/100")
+    print(f"Overall Inompatibility Rating: {dish_analysis['overall_rating']:.1f}/100")
     print("=" * 80)
 
     # Split the text by <p> tags and print each paragraph separately

@@ -3,7 +3,7 @@ import re
 
 from rich import print
 
-from ai.utils import gemini
+from ai.utils import gemini, build_user_profile
 
 
 def analyze_ingredient(ingredient: str, user_profile: dict) -> dict:
@@ -18,17 +18,17 @@ def analyze_ingredient(ingredient: str, user_profile: dict) -> dict:
         dict: A dictionary containing the analysis results.
     """
     prompt = (
-        f"Given the user's intolerance profile: {user_profile}, analyze the ingredient: {ingredient}. "
+        f"Given the user's intolerance profile: \n\n {build_user_profile(user_profile)} \n\n, analyze the ingredient: {ingredient}. "
         "Provide a rating from 0 (fully compatible) to 100 (extremely incompatible), along with a detailed explanation. "
         "Respond with a single JSON object with the following structure: "
-        '{"rating": float, "text": "A visual text which the user can read. Tell him about the ingredient and the rating. Also alternatives he may consider if he is intolerant to this ingredient. 5-10 sentences. Paragraphs. Mark paragraphs with <p> tags. Max 2 paragraphs."}. '
+        '{"rating": float, "text": "A visual text which the user can read. Tell him about the ingredient and the rating. Also alternatives he may consider if he is intolerant to this ingredient. 5-10 sentences. Paragraphs. Mark paragraphs with <p> tags. Max 2 paragraphs. Do not include any other text or explanation."}. '
         "Do not include any other text or explanation."
     )
 
     response = gemini().models.generate_content(
-        model="gemini-2.0-flash",
+        model="gemini-2.5-flash-preview-05-20",
         contents=prompt,
-        config={"response_modalities": ["TEXT"], "temperature": 0.0},
+        config={"response_modalities": ["TEXT"]},
     )
 
     for part in response.candidates[0].content.parts:
@@ -51,8 +51,18 @@ def analyze_ingredient(ingredient: str, user_profile: dict) -> dict:
 
 if __name__ == "__main__":
     # Example usage
-    ingredient = "Flour"
-    user_profile = "The user is lactose intolerant. They have no other intolerances."
+    ingredient = "Chocolate"
+
+    user_profile = {
+        "intolerances": {
+            "fructose": True,
+            "gluten": False,
+            "lactose": False,
+            "peanut": False,
+        },
+        "notes": "",
+    }
+
     result = analyze_ingredient(ingredient, user_profile)
 
     print(f"\n🥗 Ingredient Analysis: {ingredient.capitalize()}")
