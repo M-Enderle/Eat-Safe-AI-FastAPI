@@ -54,12 +54,7 @@ if __name__ == "__main__":
     ingredient = "Chocolate"
 
     user_profile = {
-        "intolerances": {
-            "fructose": True,
-            "gluten": False,
-            "lactose": False,
-            "peanut": False,
-        },
+        "intolerances": ["fructose"],
         "notes": "",
     }
 

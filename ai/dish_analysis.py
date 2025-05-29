@@ -205,12 +205,7 @@ if __name__ == "__main__":
     dish_name = "Mango Milkshake"
 
     user_profile = {
-        "intolerances": {
-            "fructose": True,
-            "gluten": False,
-            "lactose": False,
-            "peanut": False,
-        },
+        "intolerances": ["fructose"],
         "notes": "",
     }
 
