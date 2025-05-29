@@ -144,7 +144,7 @@ def generate_text(ingredients: dict, user_profile: dict, dish_name: str) -> str:
     )
 
     response = gemini().models.generate_content(
-        model="gemini-2.0-flash",
+        model="gemini-2.5-flash-preview-05-20",
         contents=prompt,
         config={"response_modalities": ["TEXT"], "temperature": 0.0},
     )

@@ -24,7 +24,7 @@ class SearchResult(BaseModel):
     name: str
     overall_rating: float
     text: str
-    ingredients_rating: list
+    ingredients_rating: dict
     timestamp: datetime
     is_ingredient: bool
 
@@ -56,7 +56,7 @@ async def search_items(request: SearchRequest) -> SearchResult:
             name=food_query,
             overall_rating=dish_analysis.get("overall_rating", 0),
             text=dish_analysis.get("text", ""),
-            ingredients_rating=dish_analysis.get("ingredients", []),
+            ingredients_rating=dish_analysis.get("ingredients", {}),
             timestamp=datetime.now(),
             is_ingredient=is_ingredient,
         )
@@ -72,7 +72,7 @@ async def search_items(request: SearchRequest) -> SearchResult:
             name=food_query,
             overall_rating=ingredient_analysis.get("overall_rating", 0),
             text=ingredient_analysis.get("text", ""),
-            ingredients_rating=[],
+            ingredients_rating={},
             timestamp=datetime.now(),
             is_ingredient=is_ingredient,
         )
