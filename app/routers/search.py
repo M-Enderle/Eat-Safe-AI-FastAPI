@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+from typing import Optional
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
@@ -26,7 +27,7 @@ class SearchResult(BaseModel):
 @router.get("/search", response_model=SearchResult)
 async def search_items(
     query: str,
-    user_profile: json = None,
+    user_profile: Optional[dict] = None,
 ) -> SearchResult:
     """
     Search for items based on the query string.
