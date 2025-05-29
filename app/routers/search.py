@@ -13,6 +13,11 @@ from ai.safety import is_safe
 router = APIRouter()
 
 
+class SearchRequest(BaseModel):
+    query: str
+    user_profile: Optional[dict] = None
+
+
 class SearchResult(BaseModel):
     status: str
     imageBase64: str
@@ -24,15 +29,12 @@ class SearchResult(BaseModel):
     is_ingredient: bool
 
 
-@router.get("/search", response_model=SearchResult)
-async def search_items(
-    query: str,
-    user_profile: dict,
-) -> SearchResult:
+@router.post("/search", response_model=SearchResult)
+async def search_items(request: SearchRequest) -> SearchResult:
     """
     Search for items based on the query string.
     """
-    safe, food_query, is_ingredient = is_safe(query)
+    safe, food_query, is_ingredient = is_safe(request.query)
 
     if not safe:
         raise HTTPException(status_code=400, detail="Please enter a valid food query.")
@@ -44,7 +46,7 @@ async def search_items(
         raise HTTPException(status_code=500, detail="Image generation failed.")
 
     if not is_ingredient:
-        dish_analysis = analyze_dish(food_query, user_profile)
+        dish_analysis = analyze_dish(food_query, request.user_profile)
         if not dish_analysis:
             raise HTTPException(status_code=500, detail="Failed to analyze dish.")
 
@@ -60,7 +62,7 @@ async def search_items(
         )
 
     else:
-        ingredient_analysis = analyze_ingredient(food_query, user_profile)
+        ingredient_analysis = analyze_ingredient(food_query, request.user_profile)
         if not ingredient_analysis:
             raise HTTPException(status_code=500, detail="Failed to analyze ingredient.")
 
