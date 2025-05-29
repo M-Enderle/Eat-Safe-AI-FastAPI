@@ -188,7 +188,7 @@ def analyze_dish(dish_name: str, user_profile: dict) -> dict:
     final_return_json = {
         "overall_rating": overall_rating,
         "text": text,
-        "ingredients_rating": ingredients,
+        "ingredients": ingredients,
     }
 
     return final_return_json
