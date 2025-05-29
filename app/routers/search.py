@@ -27,7 +27,7 @@ class SearchResult(BaseModel):
 @router.get("/search", response_model=SearchResult)
 async def search_items(
     query: str,
-    user_profile: Optional[dict] = None,
+    user_profile: dict,
 ) -> SearchResult:
     """
     Search for items based on the query string.
