@@ -15,7 +15,7 @@ router = APIRouter()
 
 class SearchRequest(BaseModel):
     query: str
-    user_profile: List[str]
+    user_profile: dict
 
 
 class SearchResult(BaseModel):
