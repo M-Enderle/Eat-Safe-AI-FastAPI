@@ -28,7 +28,8 @@ def is_safe(search_term: str) -> Tuple[bool, str]:
         f'Content: {search_term}. Second task is to return the food query in singular english form. '
         f'So for example "pizzas" return "pizza" and "Pommes" return "Potatoe Fries". '
         f'Return only the english name in no other language. Keep the name short. '
-        f'Return a json with the following keys: "is_safe" and "food_query". '
+        f'Then decide if the food is an ingredient or a dish. A dish is a food that is prepared and served as a meal, while an ingredient is a substance used in the preparation of food. '
+        f'Return a json with the following keys: "is_safe", "food_query" and "is_ingredient".'
     )
 
     response = gemini().models.generate_content(
@@ -49,9 +50,10 @@ def is_safe(search_term: str) -> Tuple[bool, str]:
                     if isinstance(result, dict) and "is_safe" in result and "food_query" in result:
                         is_safe = result["is_safe"]
                         food_query = result["food_query"]
-                        logging.info(f"Content: {search_term}, Is Safe: {is_safe}, Food Query: {food_query}")
+                        is_ingredient = result.get("is_ingredient", False)
+                        logging.info(f"Content: {search_term}, Is Safe: {is_safe}, Food Query: {food_query}, Is Ingredient: {is_ingredient}")
                         logging.info(f"Time taken: {time.time() - start_time:.2f} seconds")
-                        return is_safe, food_query
+                        return is_safe, food_query, is_ingredient
                 else:
                     logging.error("No JSON object found in response.")
             except Exception as e:
@@ -60,3 +62,8 @@ def is_safe(search_term: str) -> Tuple[bool, str]:
                 return False, ""
     logging.error("No valid response received.")
     return False, ""
+
+
+if __name__ == "__main__":
+    is_safe, food_query, is_ingredient = is_safe("pizza")
+    print(f"Is Safe: {is_safe}, Food Query: {food_query}, Is Ingredient: {is_ingredient}")
