@@ -86,6 +86,7 @@ def get_image(food_query: str) -> str:
 
 
 if __name__ == "__main__":
-    blobs = vercel_blob.list().get("blobs", [])
-    match = next((obj for obj in blobs if obj['pathname'] == "banana.jpg"), None)
-    print(match)
+    ingredient = "chocolate bar"
+    image = get_image(ingredient)
+    with open("image.jpg", "wb") as f:
+        f.write(base64.b64decode(image))
