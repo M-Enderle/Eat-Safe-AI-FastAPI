@@ -23,7 +23,7 @@ class SearchResult(BaseModel):
     imageBase64: str
     name: str
     overall_rating: float
-    text: List[str]
+    text: List[dict]
     ingredients_rating: List[dict]
     timestamp: datetime
     is_ingredient: bool
@@ -55,7 +55,7 @@ async def search_items(request: SearchRequest) -> SearchResult:
             imageBase64=image_base64,
             name=food_query,
             overall_rating=dish_analysis.get("overall_rating", 0),
-            text=[p.strip().replace("<p>", "").replace("</p>", "") for p in dish_analysis.get("text", "").split("<p>") if p.strip()],
+            text=dish_analysis.get("text", []),
             ingredients_rating=list(dish_analysis.get("ingredients", [])),
             timestamp=datetime.now(),
             is_ingredient=is_ingredient,
@@ -71,7 +71,7 @@ async def search_items(request: SearchRequest) -> SearchResult:
             imageBase64=image_base64,
             name=food_query,
             overall_rating=ingredient_analysis.get("overall_rating", 0),
-            text=[p.strip().replace("<p>", "").replace("</p>", "") for p in ingredient_analysis.get("text", "").split("<p>") if p.strip()],
+            text=ingredient_analysis.get("text", []),
             ingredients_rating=[],
             timestamp=datetime.now(),
             is_ingredient=is_ingredient,

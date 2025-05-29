@@ -128,19 +128,36 @@ def generate_overall_rating(ingredients: dict, user_profile: dict) -> float:
     return sum(ratings) / len(ratings) if ratings else 0.0
 
 
-def generate_text(ingredients: dict, user_profile: dict, dish_name: str) -> str:
+def generate_text(ingredients: dict, user_profile: dict, dish_name: str) -> list:
     """
-    Generate a text which gets displayed to the user.
+    Generate a list of 1-2 hints (max 3), each as a dict with a keyword and a single-sentence tip.
     """
+    # Calculate overall rating to determine if replacements are needed
+    ratings = [ingredient.get("rating", 0) for ingredient in ingredients.values()]
+    avg_rating = sum(ratings) / len(ratings) if ratings else 0.0
+    
     prompt = (
         f"Given the dish '{dish_name}' and its ingredients analysis: {json.dumps(ingredients)}, "
         f"and the user's intolerance profile: \n\n {build_user_profile(user_profile)} \n\n, "
-        "provide a detailed analysis of the dish. "
-        "Include information about the overall compatibility, key ingredients to watch out for, "
-        "and potential modifications or alternatives. "
-        "Format the response as a JSON object with a 'text' field containing HTML-formatted paragraphs "
-        "using <p> tags. The text should be 5-10 sentences split into max 2 paragraphs. "
-        'Example format: {"text": "<p>First paragraph...</p><p>Second paragraph...</p>"}'
+        f"provide 1-2 helpful hints for the user (maximum 3), each as a single sentence. "
+        "Always include at least one 'Tip' hint about the dish or its preparation. "
+    )
+    
+    # Add replacement instruction only if the dish has a bad rating (>60)
+    if avg_rating > 60:
+        prompt += (
+            "Since this dish has compatibility issues, also include an 'Alternative' or 'Replacement' hint "
+            "suggesting how to modify the dish or replace problematic ingredients. "
+        )
+    
+    prompt += (
+        "Each hint must be a dict with a 'keyword' (such as 'Tip', 'Did you know', 'Care', 'Alternative', 'Replacement', etc.) and a 'text' field (the single-sentence tip). "
+        "Return a JSON list of these dicts. "
+        "Example: ["
+        '{"keyword": "Tip", "text": "This dish is traditionally served warm for better digestion."}, '
+        '{"keyword": "Alternative", "text": "You can replace milk with almond milk for a lactose-free option."}'
+        "] "
+        "Do not include any other text or explanation."
     )
 
     response = gemini().models.generate_content(
@@ -152,17 +169,19 @@ def generate_text(ingredients: dict, user_profile: dict, dish_name: str) -> str:
     for part in response.candidates[0].content.parts:
         if part.text is not None:
             try:
-                match = re.search(r"\{.*\}", part.text, re.DOTALL)
+                match = re.search(r"\[.*\]", part.text, re.DOTALL)
                 if match:
                     json_str = match.group(0)
                     result = json.loads(json_str)
-                    if isinstance(result, dict) and "text" in result:
-                        return result["text"]
+                    if isinstance(result, list):
+                        return result
             except Exception as e:
                 print(f"Error parsing response: {e}")
                 continue
 
-    return "<p>Unable to generate detailed analysis for this dish.</p>"
+    return [
+        {"keyword": "Tip", "text": "Consider consulting with a nutritionist for personalized advice about this dish."}
+    ]
 
 
 def analyze_dish(dish_name: str, user_profile: dict) -> dict:
@@ -213,11 +232,11 @@ if __name__ == "__main__":
 
     print(f"\n🍽️  Dish Analysis: {dish_name}")
     print("=" * 80)
-    print(f"Overall Inompatibility Rating: {dish_analysis['overall_rating']:.1f}/100")
+    print(f"Overall Incompatibility Rating: {dish_analysis.get('overall_rating', 0):.1f}/100")
     print("=" * 80)
 
-    # Split the text by <p> tags and print each paragraph separately
-    paragraphs = dish_analysis["text"].split("<p>")
+    # Print the generated text, splitting by <p> tags for paragraphs
+    paragraphs = dish_analysis.get("text", "").split("<p>")
     for paragraph in paragraphs:
         paragraph = paragraph.strip().replace("<p>", "").replace("</p>", "")
         if paragraph:
@@ -226,12 +245,9 @@ if __name__ == "__main__":
 
     print("\n📋 Ingredients Analysis:")
     print("=" * 80)
-    for ingredient_name, ingredient_data in dish_analysis["ingredients_rating"].items():
-        rating = ingredient_data.get("rating", 0)
-        g_100 = ingredient_data.get("g_100", 0)
-        weighted_rating = ingredient_data.get("weighted_rating", 0)
-        print(f"🥗 {ingredient_name.capitalize()}:")
-        print(f"   Rating: {rating:.1f}/100")
-        print(f"   Amount: {g_100}g per 100g of dish")
-        print(f"   Weighted Impact: {weighted_rating:.2f}")
+    for ingredient in dish_analysis.get("ingredients", []):
+        name = ingredient.get("ingredient_name", "Unknown")
+        rating = ingredient.get("rating", 0)
+        print(f"🥗 {name.capitalize()}:")
+        print(f"   Weighted Impact: {rating:.2f}")
         print("-" * 40)
