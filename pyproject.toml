@@ -15,6 +15,7 @@ dotenv = "^0.9.9"
 pillow = "^11.2.1"
 joblib = "^1.4.2"
 vercel-blob = "^0.3.2"
+rich = "^14.0.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.4.0"
