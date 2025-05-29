@@ -33,6 +33,8 @@ def is_safe(search_term: str) -> Tuple[bool, str]:
         f"Return only the english name in no other language. Keep the name short. "
         f"Then decide if the food is an ingredient or a dish. A dish is a food that is prepared and served as a meal, while an ingredient is a substance used in the preparation of food. "
         f'Return a json with the following keys: "is_safe", "food_query" and "is_ingredient".'
+        f"For example: {{'is_safe': True, 'food_query': 'pizza', 'is_ingredient': False}}"
+        f"Answer only with the json object. Do not include any other text or explanation."
     )
 
     response = gemini().models.generate_content(
