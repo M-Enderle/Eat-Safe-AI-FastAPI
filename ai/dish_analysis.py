@@ -185,10 +185,19 @@ def analyze_dish(dish_name: str, user_profile: dict) -> dict:
     overall_rating = generate_overall_rating(ingredients, user_profile)
     text = generate_text(ingredients, user_profile, dish_name)
 
+    # Transform ingredients dict to list of objects with ingredient_name and rating
+    ingredients_list = [
+        {
+            "ingredient_name": name,
+            "rating": data.get("weighted_rating", 0)
+        }
+        for name, data in ingredients.items()
+    ]
+
     final_return_json = {
         "overall_rating": overall_rating,
         "text": text,
-        "ingredients": ingredients,
+        "ingredients": ingredients_list,
     }
 
     return final_return_json
