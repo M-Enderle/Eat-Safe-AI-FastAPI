@@ -1,16 +1,18 @@
-from ai.utils import gemini
-import re
 import json
+import re
+
 from rich import print
+
+from ai.utils import gemini
 
 
 def get_common_ingredients(dish_name: str) -> list:
     """
     Get common ingredients for a given dish name.
-    
+
     Args:
         dish_name (str): The name of the dish.
-        
+
     Returns:
         list: A list of common ingredients for the dish.
     """
@@ -21,18 +23,18 @@ def get_common_ingredients(dish_name: str) -> list:
         '{"spaghetti": {"g_100": 40}, "egg": {"g_100": 20}, "bacon": {"g_100": 20}, "cheese": {"g_100": 20}}. '
         "Do not include any other text or explanation."
     )
-    
+
     response = gemini().models.generate_content(
         model="gemini-2.0-flash-lite",
         contents=prompt,
-        config={"response_modalities": ['TEXT'], "temperature": 0.0}
+        config={"response_modalities": ["TEXT"], "temperature": 0.0},
     )
 
     for part in response.candidates[0].content.parts:
         if part.text is not None:
             try:
                 # Use regex to extract JSON object substring
-                match = re.search(r'\{.*\}', part.text, re.DOTALL)
+                match = re.search(r"\{.*\}", part.text, re.DOTALL)
                 if match:
                     json_str = match.group(0)
                     result = json.loads(json_str)
@@ -57,21 +59,21 @@ def get_ingredients_rating(ingredient: list, user_profile: dict) -> float:
         f"Ingredients: {ingredient}. "
         "For each ingredient, provide a rating from 0 (fully compatible) to 100 (extremely incompatible), along with a brief explanation. "
         "Respond with a single JSON object mapping each ingredient name to an object with 'rating' and 'explanation' fields. "
-        "Example: {\"apple\": {\"rating\": 0.0, \"explanation\": \"fully compatible\"}, \"banana\": {\"rating\": 50.0, \"explanation\": \"moderately incompatible\"}}. "
+        'Example: {"apple": {"rating": 0.0, "explanation": "fully compatible"}, "banana": {"rating": 50.0, "explanation": "moderately incompatible"}}. '
         "Do not include any other text or explanation."
     )
-    
+
     response = gemini().models.generate_content(
         model="gemini-2.0-flash",
         contents=prompt,
-        config={"response_modalities": ['TEXT'], "temperature": 0.0},
+        config={"response_modalities": ["TEXT"], "temperature": 0.0},
     )
 
     for part in response.candidates[0].content.parts:
         if part.text is not None:
             try:
                 # Use regex to extract JSON object substring
-                match = re.search(r'\{.*\}', part.text, re.DOTALL)
+                match = re.search(r"\{.*\}", part.text, re.DOTALL)
                 if match:
                     json_str = match.group(0)
                     result = json.loads(json_str)
@@ -92,17 +94,26 @@ def generate_overall_rating(ingredients: dict, user_profile: dict) -> float:
     """
     if not ingredients:
         return 0.0
-    
+
     # Calculate overall rating based on weighted average
-    total_weight = sum(ingredient.get('g_100', 0) for ingredient in ingredients.values())
+    total_weight = sum(
+        ingredient.get("g_100", 0) for ingredient in ingredients.values()
+    )
     if total_weight > 0:
-        overall_rating = sum(ingredient.get('weighted_rating', 0) for ingredient in ingredients.values()) / total_weight
+        overall_rating = (
+            sum(
+                ingredient.get("weighted_rating", 0)
+                for ingredient in ingredients.values()
+            )
+            / total_weight
+        )
     else:
         # If no weights available, use simple average
-        ratings = [ingredient.get('rating', 0) for ingredient in ingredients.values()]
+        ratings = [ingredient.get("rating", 0) for ingredient in ingredients.values()]
         overall_rating = sum(ratings) / len(ratings) if ratings else 0.0
-    
+
     return overall_rating
+
 
 def generate_text(ingredients: dict, user_profile: dict, dish_name: str) -> str:
     """
@@ -116,19 +127,19 @@ def generate_text(ingredients: dict, user_profile: dict, dish_name: str) -> str:
         "and potential modifications or alternatives. "
         "Format the response as a JSON object with a 'text' field containing HTML-formatted paragraphs "
         "using <p> tags. The text should be 5-10 sentences split into max 2 paragraphs. "
-        "Example format: {\"text\": \"<p>First paragraph...</p><p>Second paragraph...</p>\"}"
+        'Example format: {"text": "<p>First paragraph...</p><p>Second paragraph...</p>"}'
     )
 
     response = gemini().models.generate_content(
         model="gemini-2.0-flash",
         contents=prompt,
-        config={"response_modalities": ['TEXT'], "temperature": 0.0}
+        config={"response_modalities": ["TEXT"], "temperature": 0.0},
     )
 
     for part in response.candidates[0].content.parts:
         if part.text is not None:
             try:
-                match = re.search(r'\{.*\}', part.text, re.DOTALL)
+                match = re.search(r"\{.*\}", part.text, re.DOTALL)
                 if match:
                     json_str = match.group(0)
                     result = json.loads(json_str)
@@ -140,6 +151,7 @@ def generate_text(ingredients: dict, user_profile: dict, dish_name: str) -> str:
 
     return "<p>Unable to generate detailed analysis for this dish.</p>"
 
+
 def analyze_dish(dish_name: str, user_profile: dict) -> dict:
     """
     Analyze a dish and return a rating and explanation.
@@ -150,11 +162,11 @@ def analyze_dish(dish_name: str, user_profile: dict) -> dict:
     print(ratings)
 
     for name, value in ingredients.items():
-        rating = ratings.get(name, {}).get('rating', 0)
-        g_per_100 = value.get('g_100', 0)
+        rating = ratings.get(name, {}).get("rating", 0)
+        g_per_100 = value.get("g_100", 0)
         weighted_rating = rating * g_per_100 / 100
-        ingredients[name]['weighted_rating'] = weighted_rating
-        ingredients[name]['rating'] = rating
+        ingredients[name]["weighted_rating"] = weighted_rating
+        ingredients[name]["rating"] = rating
 
     # Use the dedicated functions
     overall_rating = generate_overall_rating(ingredients, user_profile)
@@ -165,37 +177,36 @@ def analyze_dish(dish_name: str, user_profile: dict) -> dict:
         "text": text,
         "ingredients_rating": ingredients,
     }
-    
+
     return final_return_json
 
 
 if __name__ == "__main__":
-
     dish_name = "Mango Milkshake"
 
     user_profile = "The user is intolerant to fructose. He has no other intolerances."
 
     dish_analysis = analyze_dish(dish_name, user_profile)
-    
+
     print(f"\n🍽️  Dish Analysis: {dish_name}")
     print("=" * 80)
     print(f"Overall Rating: {dish_analysis['overall_rating']:.1f}/100")
     print("=" * 80)
-    
+
     # Split the text by <p> tags and print each paragraph separately
-    paragraphs = dish_analysis['text'].split('<p>')
+    paragraphs = dish_analysis["text"].split("<p>")
     for paragraph in paragraphs:
-        paragraph = paragraph.strip().replace('<p>', '').replace('</p>', '')
+        paragraph = paragraph.strip().replace("<p>", "").replace("</p>", "")
         if paragraph:
             print(paragraph)
             print("-" * 100)
-    
+
     print("\n📋 Ingredients Analysis:")
     print("=" * 80)
-    for ingredient_name, ingredient_data in dish_analysis['ingredients_rating'].items():
-        rating = ingredient_data.get('rating', 0)
-        g_100 = ingredient_data.get('g_100', 0)
-        weighted_rating = ingredient_data.get('weighted_rating', 0)
+    for ingredient_name, ingredient_data in dish_analysis["ingredients_rating"].items():
+        rating = ingredient_data.get("rating", 0)
+        g_100 = ingredient_data.get("g_100", 0)
+        weighted_rating = ingredient_data.get("weighted_rating", 0)
         print(f"🥗 {ingredient_name.capitalize()}:")
         print(f"   Rating: {rating:.1f}/100")
         print(f"   Amount: {g_100}g per 100g of dish")
