@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
@@ -23,7 +23,7 @@ class SearchResult(BaseModel):
     imageBase64: str
     name: str
     overall_rating: float
-    text: str
+    text: List[str]
     ingredients_rating: dict
     timestamp: datetime
     is_ingredient: bool
@@ -55,7 +55,7 @@ async def search_items(request: SearchRequest) -> SearchResult:
             imageBase64=image_base64,
             name=food_query,
             overall_rating=dish_analysis.get("overall_rating", 0),
-            text=dish_analysis.get("text", ""),
+            text=[p.strip().replace("<p>", "").replace("</p>", "") for p in dish_analysis.get("text", "").split("<p>")],
             ingredients_rating=dish_analysis.get("ingredients", {}),
             timestamp=datetime.now(),
             is_ingredient=is_ingredient,
@@ -71,7 +71,7 @@ async def search_items(request: SearchRequest) -> SearchResult:
             imageBase64=image_base64,
             name=food_query,
             overall_rating=ingredient_analysis.get("overall_rating", 0),
-            text=ingredient_analysis.get("text", ""),
+            text=[p.strip().replace("<p>", "").replace("</p>", "") for p in ingredient_analysis.get("text", "").split("<p>")],
             ingredients_rating={},
             timestamp=datetime.now(),
             is_ingredient=is_ingredient,
