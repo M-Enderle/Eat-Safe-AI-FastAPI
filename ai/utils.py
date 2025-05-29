@@ -19,11 +19,7 @@ def build_user_profile(user_profile: dict) -> str:
     Build a user profile string from a dictionary.
     """
 
-    intolerances = [
-        ingredient
-        for ingredient in user_profile["intolerances"].keys()
-        if user_profile["intolerances"][ingredient]
-    ]
-    notes = user_profile["notes"]
+    intolerances = user_profile.get("intolerances", [])
+    notes = user_profile.get("notes", "")
 
-    return f"The user is intolerant to {','.join(intolerances)}. He also has the following notes: {notes}"
+    return f"The user is intolerant to {' and '.join(intolerances)}. He also has the following notes: {notes}"

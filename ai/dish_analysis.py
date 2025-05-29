@@ -170,9 +170,7 @@ def analyze_dish(dish_name: str, user_profile: dict) -> dict:
     Analyze a dish and return a rating and explanation.
     """
     ingredients = get_common_ingredients(dish_name)
-    print(ingredients)
     ratings = get_ingredients_rating(ingredients, user_profile)
-    print(ratings)
 
     for name, value in ingredients.items():
         rating = ratings.get(name, {}).get("rating", 0)
