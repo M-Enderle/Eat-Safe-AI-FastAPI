@@ -21,7 +21,7 @@ def analyze_ingredient(ingredient: str, user_profile: dict) -> dict:
         f"Given the user's intolerance profile: \n\n {build_user_profile(user_profile)} \n\n, analyze the ingredient: {ingredient}. "
         "Provide a rating from 0 (fully compatible) to 100 (extremely incompatible), along with a detailed explanation. "
         "Respond with a single JSON object with the following structure: "
-        '{"rating": float, "text": "A visual text which the user can read. Tell him about the ingredient and the rating. Also alternatives he may consider if he is intolerant to this ingredient. 5-10 sentences. Paragraphs. Mark paragraphs with <p> tags. Max 2 paragraphs. Do not include any other text or explanation."}. '
+        '{"overall_rating": float, "text": "A visual text which the user can read. Tell him about the ingredient and the rating. Also alternatives he may consider if he is intolerant to this ingredient. 5-10 sentences. Paragraphs. Mark paragraphs with <p> tags. Max 2 paragraphs. Do not include any other text or explanation."}. '
         "Do not include any other text or explanation."
     )
 
