@@ -59,7 +59,7 @@ def get_ingredients_rating(ingredient: list, user_profile: dict) -> float:
         f"Ingredients: {ingredient}. "
         "For each ingredient, provide a rating from 0 (problematic) to 100 (fully compatible), along with a brief explanation. "
         "Respond with a single JSON object mapping each ingredient name to an object with 'rating' and 'explanation' fields. "
-        'Example: {"apple": {"rating": 100.0, "explanation": "fully compatible"}, "banana": {"rating": 50.0, "explanation": "moderately compatible"}}. '
+        'Example: {"salt": {"rating": 100.0, "explanation": "fully compatible"}, "banana": {"rating": 50.0, "explanation": "moderately compatible"}}. '
         "Do not include any other text or explanation."
     )
 
@@ -193,9 +193,6 @@ def analyze_dish(dish_name: str, user_profile: dict) -> dict:
 
     for name, value in ingredients.items():
         rating = ratings.get(name, {}).get("rating", 0)
-        g_per_100 = value.get("g_100", 0)
-        weighted_rating = rating * g_per_100 / 100
-        ingredients[name]["weighted_rating"] = weighted_rating
         ingredients[name]["rating"] = rating
 
     # Use the dedicated functions
@@ -206,7 +203,7 @@ def analyze_dish(dish_name: str, user_profile: dict) -> dict:
     ingredients_list = [
         {
             "ingredient_name": name,
-            "rating": data.get("weighted_rating", 0)
+            "rating": data.get("rating", 0)
         }
         for name, data in ingredients.items()
     ]
