@@ -8,7 +8,7 @@ def get_daily_tips(user_profile: dict) -> str:
     response = gemini().models.generate_content(
         model="gemini-2.5-flash-preview-05-20",
         contents=prompt,
-        config={"response_modalities": ["TEXT"], "temperature": 0.0},
+        config={"response_modalities": ["TEXT"], "temperature": 1.5},
     )
     # cut of the "Did your know" part
     return response.candidates[0].content.parts[0].text.split("Did you know ")[1].strip()
