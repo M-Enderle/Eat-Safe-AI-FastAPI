@@ -20,7 +20,7 @@ def analyze_ingredient(ingredient: str, user_profile: dict) -> dict:
     # First, get a preliminary rating to decide on hint types
     rating_prompt = (
         f"Given the user's intolerance profile: \n\n {build_user_profile(user_profile)} \n\n, "
-        f"rate the compatibility of {ingredient} from 0 (fully compatible) to 100 (extremely incompatible). "
+        f"rate the compatibility of {ingredient} from 0 (problematic) to 100 (fully compatible). "
         "Respond with only a number."
     )
     
@@ -41,13 +41,13 @@ def analyze_ingredient(ingredient: str, user_profile: dict) -> dict:
     
     prompt = (
         f"Given the user's intolerance profile: \n\n {build_user_profile(user_profile)} \n\n, analyze the ingredient: {ingredient}. "
-        "Provide a rating from 0 (fully compatible) to 100 (extremely incompatible). "
+        "Provide a rating from 0 (problematic) to 100 (fully compatible). "
         "Also provide 1-2 helpful hints about this ingredient (maximum 3), each as a single sentence. "
         "Always include at least one 'Tip' hint about the ingredient or its use. "
     )
     
-    # Add replacement instruction only if the ingredient has a bad rating (>60)
-    if preliminary_rating > 60:
+    # Add replacement instruction only if the ingredient has a bad rating (<40)
+    if preliminary_rating < 40:
         prompt += (
             "Since this ingredient has compatibility issues, also include an 'Alternative' or 'Replacement' hint "
             "suggesting suitable substitutes for this ingredient. "
@@ -58,7 +58,7 @@ def analyze_ingredient(ingredient: str, user_profile: dict) -> dict:
         '{"overall_rating": float, "text": [{"keyword": "string", "text": "string"}]}. '
         "Each hint must be a dict with a 'keyword' (such as 'Tip', 'Did you know', 'Care', 'Alternative', 'Replacement', etc.) and a 'text' field (the single-sentence tip). "
         "Example: "
-        '{"overall_rating": 25.0, "text": [{"keyword": "Tip", "text": "This ingredient is best used in moderation."}, {"keyword": "Alternative", "text": "You can replace this with a lactose-free alternative."}]}. '
+        '{"overall_rating": 95.0, "text": [{"keyword": "Tip", "text": "This ingredient is best used in moderation."}, {"keyword": "Alternative", "text": "You can replace this with a lactose-free alternative."}]}. '
         "Do not include any other text or explanation."
     )
 
@@ -116,13 +116,13 @@ if __name__ == "__main__":
     print(f"\n📊 Summary:")
     print("=" * 80)
     rating = result.get("overall_rating", 0)
-    if rating <= 20:
+    if rating >= 80:
         compatibility = "🟢 Excellent - Fully Compatible"
-    elif rating <= 40:
+    elif rating >= 60:
         compatibility = "🟡 Good - Minor Concerns"
-    elif rating <= 60:
+    elif rating >= 40:
         compatibility = "🟠 Moderate - Some Issues"
-    elif rating <= 80:
+    elif rating >= 20:
         compatibility = "🔴 Poor - Significant Problems"
     else:
         compatibility = "🚫 Very Poor - Avoid This Ingredient"

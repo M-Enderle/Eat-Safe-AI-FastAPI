@@ -57,9 +57,9 @@ def get_ingredients_rating(ingredient: list, user_profile: dict) -> float:
         f"Given the user's intolerance profile: \n\n {build_user_profile(user_profile)} \n\n, rate the compatibility of each ingredient below. "
         "Only consider intolerances the user actually has; ignore those marked as 'Not Intolerant'. "
         f"Ingredients: {ingredient}. "
-        "For each ingredient, provide a rating from 0 (fully compatible) to 100 (extremely incompatible), along with a brief explanation. "
+        "For each ingredient, provide a rating from 0 (problematic) to 100 (fully compatible), along with a brief explanation. "
         "Respond with a single JSON object mapping each ingredient name to an object with 'rating' and 'explanation' fields. "
-        'Example: {"apple": {"rating": 0.0, "explanation": "fully compatible"}, "banana": {"rating": 50.0, "explanation": "moderately incompatible"}}. '
+        'Example: {"apple": {"rating": 100.0, "explanation": "fully compatible"}, "banana": {"rating": 50.0, "explanation": "moderately compatible"}}. '
         "Do not include any other text or explanation."
     )
 
@@ -99,7 +99,7 @@ def generate_overall_rating(ingredients: dict, user_profile: dict) -> float:
     prompt = (
         f"Given the following dish ingredients and their analysis: {json.dumps(ingredients)}, "
         f"and the user's intolerance profile: \n\n {build_user_profile(user_profile)} \n\n, "
-        "predict an overall compatibility rating for the dish from 0 (fully compatible) to 100 (extremely incompatible). "
+        "predict an overall compatibility rating for the dish from 0 (problematic) to 100 (fully compatible). "
         "Respond with a single JSON object: {\"overall_rating\": float}. "
         "Do not include any other text or explanation."
     )
@@ -143,8 +143,8 @@ def generate_text(ingredients: dict, user_profile: dict, dish_name: str) -> list
         "Always include at least one 'Tip' hint about the dish or its preparation. "
     )
     
-    # Add replacement instruction only if the dish has a bad rating (>60)
-    if avg_rating > 60:
+    # Add replacement instruction only if the dish has a bad rating (<40)
+    if avg_rating < 40:
         prompt += (
             "Since this dish has compatibility issues, also include an 'Alternative' or 'Replacement' hint "
             "suggesting how to modify the dish or replace problematic ingredients. "
@@ -232,7 +232,7 @@ if __name__ == "__main__":
 
     print(f"\n🍽️  Dish Analysis: {dish_name}")
     print("=" * 80)
-    print(f"Overall Incompatibility Rating: {dish_analysis.get('overall_rating', 0):.1f}/100")
+    print(f"Compatibility Rating: {dish_analysis.get('overall_rating', 0):.1f}/100")
     print("=" * 80)
 
     # Print the generated text, splitting by <p> tags for paragraphs
