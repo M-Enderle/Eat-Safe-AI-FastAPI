@@ -64,7 +64,7 @@ def get_ingredients_rating(ingredient: list, user_profile: dict) -> float:
     )
 
     response = gemini().models.generate_content(
-        model="gemini-2.0-flash",
+        model="gemini-2.0-flash-lite",
         contents=prompt,
         config={"response_modalities": ["TEXT"], "temperature": 0.0},
     )
@@ -218,7 +218,7 @@ def analyze_dish(dish_name: str, user_profile: dict) -> dict:
 
 
 if __name__ == "__main__":
-    dish_name = "Mango Milkshake"
+    dish_name = "Burger"
 
     user_profile = {
         "intolerances": ["fructose"],
@@ -227,24 +227,4 @@ if __name__ == "__main__":
 
     dish_analysis = analyze_dish(dish_name, user_profile)
 
-    print(f"\n🍽️  Dish Analysis: {dish_name}")
-    print("=" * 80)
-    print(f"Compatibility Rating: {dish_analysis.get('overall_rating', 0):.1f}/100")
-    print("=" * 80)
-
-    # Print the generated text, splitting by <p> tags for paragraphs
-    paragraphs = dish_analysis.get("text", "").split("<p>")
-    for paragraph in paragraphs:
-        paragraph = paragraph.strip().replace("<p>", "").replace("</p>", "")
-        if paragraph:
-            print(paragraph)
-            print("-" * 100)
-
-    print("\n📋 Ingredients Analysis:")
-    print("=" * 80)
-    for ingredient in dish_analysis.get("ingredients", []):
-        name = ingredient.get("ingredient_name", "Unknown")
-        rating = ingredient.get("rating", 0)
-        print(f"🥗 {name.capitalize()}:")
-        print(f"   Weighted Impact: {rating:.2f}")
-        print("-" * 40)
+    print(dish_analysis)

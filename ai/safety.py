@@ -78,7 +78,7 @@ def is_safe(search_term: str) -> Tuple[bool, str]:
 
 
 if __name__ == "__main__":
-    is_safe, food_query, is_ingredient = is_safe("pizza")
+    is_safe, food_query, is_ingredient = is_safe("Burger")
     print(
         f"Is Safe: {is_safe}, Food Query: {food_query}, Is Ingredient: {is_ingredient}"
     )
