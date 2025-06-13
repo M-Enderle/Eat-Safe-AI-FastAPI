@@ -1,181 +1,131 @@
-# FastAPI AI Food Analysis Server
+# EatSafeAI 🍽️
 
-A high-performance FastAPI server for AI-powered food analysis, image generation, and personalized dietary tips. Designed for seamless deployment on Vercel.
+EatSafeAI is an AI-powered mobile application built with FlutterFlow to help users manage food intolerances and allergies by providing personalized dietary recommendations. It supports iOS, Android, and Web platforms.
 
----
+## Features 🚀
 
-## 🚀 Features
+- **Personalized Dashboard**: Get tips and insights tailored to your dietary restrictions
+- **Smart Recipe Search**: AI-powered search for recipes matching your intolerances
+- **Intolerance Setup**: Easily configure your food intolerances and allergies
+- **History Management**: Track and manage your search history
+- **Secure Authentication**: Google and Apple sign-in options
 
-- **AI-powered dish and ingredient analysis** (Google Gemini)
-- **Personalized daily tips** based on user intolerance profiles
-- **Photorealistic food image generation** with caching (Vercel Blob)
-- **Content safety validation** for all queries
-- **Automatic OpenAPI docs** (`/docs`)
-- **Modern Python stack**: FastAPI, Pydantic, Poetry
-- **CORS enabled** for frontend integration
+## Tech Stack 🛠️
 
----
+- **Flutter/FlutterFlow**: Cross-platform development
+- **Firebase**: Backend services (Firestore, Auth, Cloud Functions)
+- **Google Generative AI**: Powers AI recommendations
+- **LangChain**: AI framework integration
+- **Node.js**: For Cloud Functions
 
-## 🗂️ Project Structure
-
-```
-/
-├── ai/                   # AI logic and integrations
-│   ├── dish_analysis.py      # Dish analysis and rating
-│   ├── ingredient_analysis.py# Ingredient analysis and rating
-│   ├── image_gen.py          # Food image generation and caching
-│   ├── safety.py             # Content safety validation
-│   ├── tips_generator.py     # Daily tip generation
-│   └── utils.py              # Shared utilities
-├── app/                  # FastAPI application
-│   ├── main.py               # App entry point, router registration
-│   └── routers/              # API endpoints
-│       ├── hello.py          # /hello endpoint
-│       ├── search.py         # /search endpoint
-│       └── tip.py            # /tip endpoint
-├── requirements.txt      # Exported dependencies
-├── pyproject.toml        # Poetry configuration
-├── vercel.json           # Vercel deployment config
-└── README.md             # Project documentation
-```
-
----
-
-## 🧑‍💻 API Endpoints
-
-### `GET /hello`
-Returns a simple greeting.
-
-**Response:**
-```json
-{ "message": "Hello, World!" }
-```
-
----
-
-### `POST /search`
-Analyze a dish or ingredient, generate an image, and return ratings and tips.
-
-**Request Body:**
-```json
-{
-  "query": "pizza",
-  "user_profile": { "intolerances": ["fructose"], "notes": "" }
-}
-```
-
-**Response (dish):**
-```json
-{
-  "status": "success",
-  "imageBase64": "...",
-  "name": "pizza",
-  "overall_rating": 85.0,
-  "text": [ { "keyword": "Tip", "text": "..." } ],
-  "ingredients_rating": [ { "ingredient": "cheese", "rating": 90, "explanation": "..." } ],
-  "timestamp": "2024-06-01T12:00:00",
-  "is_ingredient": false
-}
-```
-
-**Response (ingredient):**
-```json
-{
-  "status": "success",
-  "imageBase64": "...",
-  "name": "tomato",
-  "overall_rating": 95.0,
-  "text": [ { "keyword": "Tip", "text": "..." } ],
-  "ingredients_rating": [],
-  "timestamp": "2024-06-01T12:00:00",
-  "is_ingredient": true
-}
-```
-
-**Error Responses:**
-- 400: Unsafe or invalid food query
-- 500: Image generation or analysis failed
-
----
-
-### `POST /tip`
-Get a daily tip based on the user's intolerance profile.
-
-**Request Body:**
-```json
-{
-  "user_profile": { "intolerances": ["fructose"], "notes": "" }
-}
-```
-
-**Response:**
-```json
-{ "tip": "..." }
-```
-
----
-
-## ⚙️ Setup & Installation
+## Getting Started 🏁
 
 ### Prerequisites
-- Python 3.10+
-- [Poetry](https://python-poetry.org/docs/#installation)
-- Google Gemini API Key
 
-### Environment Variables
-Create a `.env` file in the project root:
+- Flutter SDK (3.0+)
+- Firebase CLI
+
+### Installation & Run
+
+1. Clone the repository and install dependencies:
+   ```bash
+   git clone https://github.com/yourusername/EatSafeAI.git
+   cd EatSafeAI
+   flutter pub get
+   ```
+
+2. Configure Firebase:
+   - Add `google-services.json` to `android/app/`
+   - Add `GoogleService-Info.plist` to `ios/Runner/`
+
+3. Run the app:
+   ```bash
+   flutter run
+   ```
+
+   For specific platforms:
+   - Android: `flutter run -d android`
+   - iOS: `flutter run -d ios`
+   - Web: `flutter run -d web-server --web-port 3000`
+
+## Project Structure Highlights 📂
+
 ```
-GEMINI_API_KEY=your_gemini_api_key_here
+📁 EatSafeAI/
+├── 📁 lib/                           # Main application source code
+│   ├── 📄 main.dart                  # App entry point
+│   ├── 📄 app_state.dart             # Global state management
+│   ├── 📁 auth/                      # Authentication logic
+│   ├── 📁 backend/                   # Backend integration (Firebase, Gemini AI)
+│   ├── 📁 components/                # Reusable UI components
+│   ├── 📁 flutter_flow/              # FlutterFlow generated utilities
+│   ├── 📁 mainpages/                 # Primary application screens
+│   ├── 📁 setup/                     # Onboarding and initial setup
+│   └── 📁 custom_code/               # Custom actions and widgets
+│
+├── 📁 assets/                        # Static application assets
+├── 📁 firebase/                      # Firebase backend configuration
+├── 📁 android/                       # Android platform-specific code
+├── 📁 ios/                           # iOS platform-specific code
+├── 📁 web/                           # Web platform-specific code
+└── 📁 test/                          # Test files
 ```
 
-### Install & Run
-```bash
-# Install dependencies
-poetry install
+## Deployment 🚀
 
-# Run the development server
-poetry run uvicorn app.main:app --reload
-```
+### Build for Production
 
----
+- **Android (APK/AAB)**:
+  ```bash
+  flutter build apk --release
+  # or
+  flutter build appbundle --release
+  ```
 
-## 🧪 Development
+- **iOS (IPA)**:
+  ```bash
+  flutter build ios --release
+  # then archive in Xcode
+  ```
 
-### Code Style & Linting
-- **Black**: `poetry run black .`
-- **isort**: `poetry run isort .`
-- **mypy**: `poetry run mypy .`
+- **Web**:
+  ```bash
+  flutter build web --release
+  ```
 
-### Testing
-- **pytest**: `poetry run pytest`
+### Firebase Deployment
 
----
+- **Cloud Functions**:
+  ```bash
+  cd firebase/functions
+  npm run deploy
+  ```
 
-## ☁️ Deployment (Vercel)
+- **Firestore Rules & Indexes**:
+  ```bash
+  firebase deploy --only firestore:rules,firestore:indexes
+  ```
 
-This project is ready for [Vercel](https://vercel.com/) deployment. The `vercel.json` configures Python builds and routes.
+- **Complete Firebase Deployment**:
+  ```bash
+  firebase deploy
+  ```
 
-```bash
-vercel
-```
+## Contributing 🤝
 
----
+We welcome contributions!
 
-## 🛠️ Technologies Used
-- **FastAPI**: API framework
-- **Pydantic**: Data validation
-- **Google Gemini**: AI for analysis & image generation
-- **Vercel Blob**: Image caching
-- **Joblib**: Local caching
-- **Poetry**: Dependency management
-- **Uvicorn**: ASGI server
-- **Pillow**: Image processing
-- **Rich**: CLI output
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/your-feature-name`
+3. Commit your changes following Dart Style Guide
+4. Push to your branch
+5. Open a Pull Request with a clear description
 
----
+## License 📜
 
-## 📄 License
-MIT (or specify your license)
+This project is licensed under the MIT License.
 
-## 👤 Contact
-Your Name — your.email@example.com
+## Authors & Contributors 👥
+
+- Hannah Durchschlag
+- Moritz Enderle
