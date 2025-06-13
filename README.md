@@ -1,144 +1,181 @@
-# FastAPI Server for Vercel
+# FastAPI AI Food Analysis Server
 
-A high-performance FastAPI server designed for deployment on Vercel, featuring AI-powered food image generation and content safety checks.
+A high-performance FastAPI server for AI-powered food analysis, image generation, and personalized dietary tips. Designed for seamless deployment on Vercel.
 
-## Features
+---
 
-- FastAPI with automatic OpenAPI documentation
-- Pydantic for data validation
-- Poetry for dependency management
-- Vercel deployment configuration
-- CORS middleware enabled
-- Gemini AI integration for image generation
-- Content safety validation
-- Vercel Blob storage for image caching
+## 🚀 Features
 
-## Getting Started
+- **AI-powered dish and ingredient analysis** (Google Gemini)
+- **Personalized daily tips** based on user intolerance profiles
+- **Photorealistic food image generation** with caching (Vercel Blob)
+- **Content safety validation** for all queries
+- **Automatic OpenAPI docs** (`/docs`)
+- **Modern Python stack**: FastAPI, Pydantic, Poetry
+- **CORS enabled** for frontend integration
 
-### Prerequisites
+---
 
-- Python 3.10 or newer
-- Poetry package manager
-- Gemini API Key
-
-### Environment Setup
-
-Create a `.env` file in the project root with:
+## 🗂️ Project Structure
 
 ```
-GEMINI_API_KEY=your_gemini_api_key_here
+/
+├── ai/                   # AI logic and integrations
+│   ├── dish_analysis.py      # Dish analysis and rating
+│   ├── ingredient_analysis.py# Ingredient analysis and rating
+│   ├── image_gen.py          # Food image generation and caching
+│   ├── safety.py             # Content safety validation
+│   ├── tips_generator.py     # Daily tip generation
+│   └── utils.py              # Shared utilities
+├── app/                  # FastAPI application
+│   ├── main.py               # App entry point, router registration
+│   └── routers/              # API endpoints
+│       ├── hello.py          # /hello endpoint
+│       ├── search.py         # /search endpoint
+│       └── tip.py            # /tip endpoint
+├── requirements.txt      # Exported dependencies
+├── pyproject.toml        # Poetry configuration
+├── vercel.json           # Vercel deployment config
+└── README.md             # Project documentation
 ```
 
-### Installation
+---
 
-```bash
-# Install dependencies
-poetry install
+## 🧑‍💻 API Endpoints
 
-# Run development server
-poetry run uvicorn app.main:app --reload
-```
-
-### API Routes
-
-- `/` - Root endpoint
-- `/hello` - Hello world example
-- `/search` - Image generation endpoint for food queries
-- `/docs` - OpenAPI documentation
-
-## API Documentation
-
-### GET /hello
-
-Returns a simple greeting message.
+### `GET /hello`
+Returns a simple greeting.
 
 **Response:**
 ```json
+{ "message": "Hello, World!" }
+```
+
+---
+
+### `POST /search`
+Analyze a dish or ingredient, generate an image, and return ratings and tips.
+
+**Request Body:**
+```json
 {
-  "message": "Hello, World!"
+  "query": "pizza",
+  "user_profile": { "intolerances": ["fructose"], "notes": "" }
 }
 ```
 
-### GET /search
-
-Generate a food image based on search query.
-
-**Parameters:**
-- `query` (string, required): The food item to generate an image for
-
-**Response:**
+**Response (dish):**
 ```json
 {
   "status": "success",
-  "imageBase64": "base64_encoded_image_string",
-  "name": "food_name",
-  "overall_rating": 4.5
+  "imageBase64": "...",
+  "name": "pizza",
+  "overall_rating": 85.0,
+  "text": [ { "keyword": "Tip", "text": "..." } ],
+  "ingredients_rating": [ { "ingredient": "cheese", "rating": 90, "explanation": "..." } ],
+  "timestamp": "2024-06-01T12:00:00",
+  "is_ingredient": false
+}
+```
+
+**Response (ingredient):**
+```json
+{
+  "status": "success",
+  "imageBase64": "...",
+  "name": "tomato",
+  "overall_rating": 95.0,
+  "text": [ { "keyword": "Tip", "text": "..." } ],
+  "ingredients_rating": [],
+  "timestamp": "2024-06-01T12:00:00",
+  "is_ingredient": true
 }
 ```
 
 **Error Responses:**
-- 400: Unsafe content detected
-- 500: Image generation failed
+- 400: Unsafe or invalid food query
+- 500: Image generation or analysis failed
 
-## Project Structure
+---
 
-```
-/
-├── ai/                   # AI module
-│   ├── image_gen.py      # Image generation with Gemini
-│   ├── safety.py         # Content safety validation
-│   └── utils.py          # Utility functions for AI services
-├── app/                  # FastAPI application
-│   ├── main.py           # Main application entry point
-│   └── routers/          # API route handlers
-│       ├── hello.py      # Hello world endpoint
-│       └── search.py     # Search endpoint for image generation
-├── pyproject.toml        # Poetry configuration
-├── requirements.txt      # Generated dependencies
-└── vercel.json           # Vercel deployment configuration
+### `POST /tip`
+Get a daily tip based on the user's intolerance profile.
+
+**Request Body:**
+```json
+{
+  "user_profile": { "intolerances": ["fructose"], "notes": "" }
+}
 ```
 
-## Technologies
+**Response:**
+```json
+{ "tip": "..." }
+```
 
-- FastAPI: Web framework for building APIs
-- Pydantic: Data validation and settings management
-- Google Gemini: AI service for image generation
-- Vercel Blob: Object storage for caching generated images
-- Joblib: Memory caching for improved performance
-- Poetry: Dependency management
-- Uvicorn: ASGI server
+---
 
-## Development
+## ⚙️ Setup & Installation
 
-### Code Style
+### Prerequisites
+- Python 3.10+
+- [Poetry](https://python-poetry.org/docs/#installation)
+- Google Gemini API Key
 
-This project uses:
-- Black for code formatting
-- isort for import sorting
-- mypy for type checking
+### Environment Variables
+Create a `.env` file in the project root:
+```
+GEMINI_API_KEY=your_gemini_api_key_here
+```
 
-Run formatting and checks:
-
+### Install & Run
 ```bash
-# Format code
-poetry run black .
-poetry run isort .
+# Install dependencies
+poetry install
 
-# Type checking
-poetry run mypy .
+# Run the development server
+poetry run uvicorn app.main:app --reload
 ```
+
+---
+
+## 🧪 Development
+
+### Code Style & Linting
+- **Black**: `poetry run black .`
+- **isort**: `poetry run isort .`
+- **mypy**: `poetry run mypy .`
 
 ### Testing
+- **pytest**: `poetry run pytest`
+
+---
+
+## ☁️ Deployment (Vercel)
+
+This project is ready for [Vercel](https://vercel.com/) deployment. The `vercel.json` configures Python builds and routes.
 
 ```bash
-poetry run pytest
-```
-
-## Deployment
-
-This project is configured for deployment on Vercel. The `vercel.json` file contains the necessary configuration for deployment.
-
-```bash
-# Deploy to Vercel
 vercel
 ```
+
+---
+
+## 🛠️ Technologies Used
+- **FastAPI**: API framework
+- **Pydantic**: Data validation
+- **Google Gemini**: AI for analysis & image generation
+- **Vercel Blob**: Image caching
+- **Joblib**: Local caching
+- **Poetry**: Dependency management
+- **Uvicorn**: ASGI server
+- **Pillow**: Image processing
+- **Rich**: CLI output
+
+---
+
+## 📄 License
+MIT (or specify your license)
+
+## 👤 Contact
+Your Name — your.email@example.com
